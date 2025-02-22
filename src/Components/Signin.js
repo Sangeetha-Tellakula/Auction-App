@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Signin() {
@@ -8,23 +7,19 @@ function Signin() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSignin = async (e) => {
+  const handleSignin = (e) => {
     e.preventDefault();
     setError('');
 
-    try {
-      const res = await axios.post('http://localhost:5001/signin', { username, password });
-      console.log('Signin Response:', res.data);
+    // Get stored user details
+    const storedUser = JSON.parse(localStorage.getItem('user'));
 
-      if (res.data.token) {
-        localStorage.setItem('authToken', res.data.token);
-        navigate('/dashboard'); // Redirect to dashboard
-      } else {
-        setError('Invalid credentials');
-      }
-    } catch (err) {
-      console.error('Signin Request Error:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    if (storedUser && storedUser.username === username && storedUser.password === password) {
+      localStorage.setItem('authToken', 'fake-auth-token');
+      alert('Signin successful! Redirecting to dashboard.');
+      navigate('/dashboard');
+    } else {
+      setError('Invalid credentials');
     }
   };
 
@@ -54,3 +49,4 @@ function Signin() {
 }
 
 export default Signin;
+

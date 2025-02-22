@@ -1,74 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function PostAuction() {
   const [itemName, setItemName] = useState('');
-  const [description, setDescription] = useState('');
-  const [startingBid, setStartingBid] = useState(0);
-  const [closingTime, setClosingTime] = useState('');
+  const [startingBid, setStartingBid] = useState('');
+  const [image, setImage] = useState(null); // Store image preview
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/signin'); // Redirect to login if not authenticated
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result); // Convert image to base64
+      };
+      reader.readAsDataURL(file);
     }
-  }, [navigate]);
+  };
 
-  const handlePostAuction = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      alert('You must be signed in to post an auction.');
-      navigate('/signin');
+    setError('');
+
+    if (!itemName || !startingBid) {
+      setError('Item Name and Starting Bid are required!');
       return;
     }
 
-    try {
-      await axios.post(
-        'http://localhost:5001/auction',
-        { itemName, description, startingBid, closingTime },
-        { headers: { Authorization: `Bearer ${token}` } } // Send token in headers
-      );
+    const newAuction = {
+      id: Date.now(), // Unique ID
+      itemName,
+      startingBid,
+      image, // Store the image preview
+      isClosed: false,
+    };
 
-      alert('Auction item posted!');
-      navigate('/dashboard');
-    } catch (err) {
-      alert('Failed to post auction. Please try again.');
-    }
+    // Save to local storage (Mimicking backend)
+    const auctions = JSON.parse(localStorage.getItem('auctions')) || [];
+    auctions.push(newAuction);
+    localStorage.setItem('auctions', JSON.stringify(auctions));
+
+    alert('Auction posted successfully!');
+    navigate('/dashboard'); // Redirect to dashboard
   };
 
   return (
     <div className="form-container">
       <h2>Post New Auction</h2>
-      <form onSubmit={handlePostAuction}>
-        <input
-          type="text"
-          placeholder="Item Name"
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
-          required
+      {error && <p className="error">{error}</p>}
+      
+      <form onSubmit={handleSubmit}>
+        <input 
+          type="text" 
+          placeholder="Item Name" 
+          value={itemName} 
+          onChange={(e) => setItemName(e.target.value)} 
+          required 
         />
-        <textarea
-          placeholder="Item Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        ></textarea>
-        <input
-          type="number"
-          placeholder="Starting Bid"
-          value={startingBid}
-          onChange={(e) => setStartingBid(e.target.value)}
-          required
+        <input 
+          type="number" 
+          placeholder="Starting Bid" 
+          value={startingBid} 
+          onChange={(e) => setStartingBid(e.target.value)} 
+          required 
         />
-        <input
-          type="datetime-local"
-          value={closingTime}
-          onChange={(e) => setClosingTime(e.target.value)}
-          required
-        />
+        
+        {/* Image Upload Field */}
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        
+        {/* Show Image Preview */}
+        {image && <img src={image} alt="Preview" style={{ width: '200px', marginTop: '10px' }} />}
+        
         <button type="submit">Post Auction</button>
       </form>
     </div>
@@ -76,3 +79,4 @@ function PostAuction() {
 }
 
 export default PostAuction;
+

@@ -27,3 +27,13 @@
     to { transform: translateX(-100%); }
 }
 
+.landing-page {
+    background-image: url('C:\Users\SANGEETHA\auction-app\public\Screenshot (2).png'); /* Use correct image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh; /* Full screen */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

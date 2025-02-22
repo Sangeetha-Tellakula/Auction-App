@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 function Signup() {
@@ -8,7 +7,7 @@ function Signup() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  const handleSignup = (e) => {
     e.preventDefault();
     setError('');
 
@@ -17,18 +16,10 @@ function Signup() {
       return;
     }
 
-    try {
-      const res = await axios.post('http://localhost:5001/signup', {
-        username,
-        password
-      });
-
-      alert('Signup successful! Please sign in.');
-      navigate('/signin'); // Redirect to signin page
-    } catch (err) {
-      console.error('Signup Error:', err.response?.data || err.message);
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
-    }
+    // Save user data in localStorage
+    localStorage.setItem('user', JSON.stringify({ username, password }));
+    alert('Signup successful! Please sign in.');
+    navigate('/signin'); // Redirect to signin page
   };
 
   return (

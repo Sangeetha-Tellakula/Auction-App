@@ -33,10 +33,14 @@ function App() {
         <header>
           <h1>Auction App</h1>
           <nav>
+          <div className="nav-right">
             <Link to="/signup" className="nav-link">Signup</Link>
             <Link to="/signin" className="nav-link">Signin</Link>
+            </div>
+            <div className="nav-left">
             <Link to="/dashboard" className="nav-link">Dashboard</Link>
             <Link to="/post-auction" className="nav-link">Post Auction</Link>
+            </div>
             {isAuthenticated && (
               <button style={{ marginLeft: '10px', background: 'red', color: 'white' }} onClick={handleLogout} className="nav-link logout-button">Logout</button>
             )}

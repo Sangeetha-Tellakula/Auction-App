@@ -1,43 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const [items, setItems] = useState([]);
-  const nav = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      nav('/signin'); // Redirect to signin if not authenticated
-      return;
-    }
-
-    const fetchItems = async () => {
-      try {
-        const res = await axios.get('http://localhost:5001/auctions');
-        setItems(res.data);
-      } catch (error) {
-        console.error('Error fetching auctions:', error);
-      }
-    };
-    fetchItems();
+    const auctions = JSON.parse(localStorage.getItem('auctions')) || [];
+    setItems(auctions);
   }, []);
-
-  // 🔹 Handle Logout
-  // const handleLogout = () => {
-  //   localStorage.removeItem('authToken'); // Remove token
-  //   navigate('/signin'); // Redirect to Sign In page
-  // };
 
   return (
     <div>
       <h2>Auction Dashboard</h2>
-
-      {/* 🔹 Logout Button 
-      <button onClick={handleLogout} style={{ marginLeft: '10px', background: 'red', color: 'white' }}>
-        Logout
-      </button>*/}
 
       <Link to="/post-auction">
         <button>Post New Auction</button>
@@ -45,10 +19,11 @@ function Dashboard() {
 
       <ul>
         {items.map((item) => (
-          <li key={item._id}>
-            <Link to={`/auction/${item._id}`}>
-              {item.itemName} - Current Bid: ${item.currentBid} {item.isClosed ? '(Closed)' : ''}
+          <li key={item.id}>
+            <Link to={`/auction/${item.id}`}>
+              <strong>{item.itemName}</strong> - Current Bid: ${item.startingBid} {item.isClosed ? '(Closed)' : ''}
             </Link>
+            {item.image && <img src={item.image} alt={item.itemName} style={{ width: '100px', marginTop: '5px' }} />}
           </li>
         ))}
       </ul>
@@ -57,3 +32,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
